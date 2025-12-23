@@ -18,12 +18,8 @@ export const useUserStore = defineStore('user', () => {
    * The current user id. null if not logged in or in single user mode.
    */
   const currentUserId = ref<string | null>(null)
-  const isMultiUserServer = computed(
-    () => userConfig.value && 'users' in userConfig.value
-  )
-  const needsLogin = computed(
-    () => !currentUserId.value && isMultiUserServer.value
-  )
+  const isMultiUserServer = true
+  const needsLogin = computed(() => !currentUserId.value && isMultiUserServer)
   const users = computed<User[]>(() =>
     Object.entries(userConfig.value?.users ?? {}).map(([userId, username]) => ({
       userId,
@@ -40,7 +36,7 @@ export const useUserStore = defineStore('user', () => {
    * Initialize the user store.
    */
   async function initialize() {
-    userConfig.value = await api.getUserConfig()
+    // userConfig.value = await api.getUserConfig()
     currentUserId.value = localStorage['Comfy.userId']
   }
 
@@ -50,18 +46,23 @@ export const useUserStore = defineStore('user', () => {
    * @param username - The username.
    * @returns The new user.
    */
-  async function createUser(username: string): Promise<User> {
-    const resp = await api.createUser(username)
+  async function createUser(user: {
+    username: string
+    password: string
+  }): Promise<User> {
+    const resp = await api.createUser(user)
     const data = await resp.json()
+
     if (resp.status >= 300) {
       throw new Error(
         data.error ??
           'Error creating user: ' + resp.status + ' ' + resp.statusText
       )
     }
+
     return {
       userId: data,
-      username
+      username: user.username
     }
   }
 
@@ -83,7 +84,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   watchEffect(() => {
-    if (isMultiUserServer.value && currentUserId.value) {
+    if (isMultiUserServer && currentUserId.value) {
       api.user = currentUserId.value
     }
   })

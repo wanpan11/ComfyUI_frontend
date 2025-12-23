@@ -1634,7 +1634,17 @@
       "workflows": "工作流"
     },
     "logout": "登出",
-    "mediaAssets": "媒体资源",
+    "mediaAssets": {
+      "title": "媒体资源",
+      "sortNewestFirst": "最新优先",
+      "sortOldestFirst": "最旧优先",
+      "sortLongestFirst": "生成时间（最长优先）",
+      "sortFastestFirst": "生成时间（最快优先）",
+      "filterImage": "图片",
+      "filterVideo": "视频",
+      "filterAudio": "音频",
+      "filter3D": "3D"
+    },
     "modelLibrary": "模型库",
     "newBlankWorkflow": "创建空白工作流",
     "noFilesFound": "未找到文件",

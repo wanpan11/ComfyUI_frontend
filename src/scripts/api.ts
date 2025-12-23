@@ -41,7 +41,6 @@ import type {
   StatusWsMessage,
   StatusWsMessageStatus,
   SystemStats,
-  User,
   UserDataFullInfo,
   PreviewMethod
 } from '@/schemas/apiSchema'
@@ -1017,22 +1016,22 @@ export class ComfyApi extends EventTarget {
   /**
    * Gets user configuration data and where data should be stored
    */
-  async getUserConfig(): Promise<User> {
-    return (await this.fetchApi('/users')).json()
-  }
+  // async getUserConfig(): Promise<User> {
+  //   return (await this.fetchApi('/users')).json()
+  // }
 
   /**
    * Creates a new user
    * @param { string } username
    * @returns The fetch response
    */
-  createUser(username: string) {
+  createUser(data: { username: string; password: string }): Promise<Response> {
     return this.fetchApi('/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username })
+      body: JSON.stringify(data)
     })
   }
 
