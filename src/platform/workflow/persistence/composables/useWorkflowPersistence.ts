@@ -15,6 +15,8 @@ import { api } from '@/scripts/api'
 import { app as comfyApp } from '@/scripts/app'
 import { getStorageValue, setStorageValue } from '@/scripts/utils'
 import { useCommandStore } from '@/stores/commandStore'
+import { useUserStore } from '@/stores/userStore'
+import { useWorkspaceStore } from '@/stores/workspaceStore'
 
 export function useWorkflowPersistence() {
   const workflowStore = useWorkflowStore()
@@ -110,6 +112,29 @@ export function useWorkflowPersistence() {
   const initializeWorkflow = async () => {
     if (!workflowPersistenceEnabled.value) return
 
+    const userStore = useUserStore()
+    // Priority 1: Fresh Login - Load user's first workflow
+    if (userStore.shouldLoadUserWorkflow) {
+      userStore.shouldLoadUserWorkflow = false // Reset flag
+
+      if (userStore.currentUser) {
+        try {
+          await useWorkspaceStore().workflow.syncWorkflows()
+          const firstWorkflow = useWorkflowStore().persistedWorkflows[0]
+          if (firstWorkflow) {
+            await useWorkflowService().openWorkflow(firstWorkflow)
+            return
+          }
+        } catch (e) {
+          console.error('Failed to load user workflow', e)
+        }
+      }
+      // Fallback to default if no user workflow found or error
+      await loadDefaultWorkflow()
+      return
+    }
+
+    // Priority 2: Restore from Storage (Refresh/Return)
     try {
       const restored = await loadPreviousWorkflowFromStorage()
       if (!restored) {

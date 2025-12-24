@@ -1,10 +1,11 @@
 <template>
   <BaseViewTemplate dark>
     <main
-      class="relative min-w-84 rounded-lg bg-(--comfy-menu-bg) p-5 px-10 shadow-lg"
+      class="relative min-w-96 rounded-lg bg-(--comfy-menu-bg) p-5 pb-10 px-10 shadow-lg mt-[-140px]"
     >
-      <h1 class="my-2.5 mb-7 font-normal">账户登录</h1>
-      <div class="flex w-full flex-col items-center">
+      <h2 class="my-2.5 mb-10 font-normal">登录您的账户</h2>
+
+      <div class="flex w-full flex-col items-center gap-6">
         <div class="flex w-full flex-col gap-2">
           <label for="username-input">用户名:</label>
           <InputText
@@ -14,7 +15,7 @@
           />
         </div>
 
-        <div class="flex w-full flex-col gap-2 mt-3">
+        <div class="flex w-full flex-col gap-2">
           <label for="password-input">密码:</label>
           <InputText
             v-model="password"
@@ -24,13 +25,13 @@
           />
         </div>
 
-        <Message v-if="error" severity="error" class="mt-3">
-          {{ error }}
-        </Message>
-
-        <footer class="mt-5">
-          <Button label="登录" @click="login" />
+        <footer class="mt-2 flex flex-col w-full">
+          <Button class="h-10 text-white" type="button" @click="login">
+            登录
+          </Button>
         </footer>
+
+        <GlobalToast />
       </div>
     </main>
   </BaseViewTemplate>
@@ -39,26 +40,29 @@
 <script setup lang="ts">
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
-import Message from 'primevue/message'
-import { computed, onMounted, ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import { onMounted, ref } from 'vue'
 
+import GlobalToast from '@/components/toast/GlobalToast.vue'
 import router from '@/router'
 import { useUserStore } from '@/stores/userStore'
 import BaseViewTemplate from '@/views/templates/BaseViewTemplate.vue'
 
 const userStore = useUserStore()
+const toast = useToast()
 
 const username = ref('')
 const password = ref('')
-const loginError = ref('')
-const error = computed(() => loginError.value)
 
 const login = async () => {
-  loginError.value = ''
-
   try {
     if (!username.value || !password.value) {
-      loginError.value = '请输入用户名和密码'
+      toast.add({
+        severity: 'error',
+        summary: '登录失败',
+        detail: '请输入用户名和密码',
+        life: 3000
+      })
       return
     }
 
@@ -69,7 +73,12 @@ const login = async () => {
 
     await router.push('/')
   } catch (err) {
-    loginError.value = err instanceof Error ? err.message : JSON.stringify(err)
+    toast.add({
+      severity: 'error',
+      summary: '登录失败',
+      detail: err instanceof Error ? err.message : JSON.stringify(err),
+      life: 3000
+    })
   }
 }
 
