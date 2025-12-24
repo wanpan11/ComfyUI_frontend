@@ -19,7 +19,7 @@ const { t } = useI18n()
 const userStore = useUserStore()
 
 const tooltip = computed(
-  () => `${t('sideToolbar.logout')} (${userStore.currentUser?.username})`
+  () => `${t('sideToolbar.logout')} (${userStore.currentUserName})`
 )
 const logout = async () => {
   await userStore.logout()

@@ -1036,6 +1036,22 @@ export class ComfyApi extends EventTarget {
   }
 
   /**
+   * Logs in a user
+   * @param { string } username
+   * @param { string } password
+   * @returns The fetch response
+   */
+  userLogin(data: { username: string; password: string }): Promise<Response> {
+    return this.fetchApi('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+  }
+
+  /**
    * Gets all setting values for the current user
    * @returns { Promise<string, unknown> } A dictionary of id -> value
    */

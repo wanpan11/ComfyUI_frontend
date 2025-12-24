@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watchEffect } from 'vue'
 
-import type { User as UserConfig } from '@/schemas/apiSchema'
 import { api } from '@/scripts/api'
 
 interface User {
@@ -9,47 +8,27 @@ interface User {
   username: string
 }
 
-export const useUserStore = defineStore('user', () => {
-  /**
-   * The user config. null if not loaded.
-   */
-  const userConfig = ref<UserConfig | null>(null)
-  /**
-   * The current user id. null if not logged in or in single user mode.
-   */
-  const currentUserId = ref<string | null>(null)
-  const isMultiUserServer = true
-  const needsLogin = computed(() => !currentUserId.value && isMultiUserServer)
-  const users = computed<User[]>(() =>
-    Object.entries(userConfig.value?.users ?? {}).map(([userId, username]) => ({
-      userId,
-      username
-    }))
-  )
-  const currentUser = computed<User | null>(
-    () =>
-      users.value.find((user) => user.userId === currentUserId.value) ?? null
-  )
-  const initialized = computed(() => userConfig.value !== null)
+interface UserLogin {
+  username: string
+  password: string
+}
 
-  /**
-   * Initialize the user store.
-   */
+export const useUserStore = defineStore('user', () => {
+  // 多用户服务
+  const isMultiUserServer = true
+  // 初始化
+  const initialized = ref(false)
+
+  const currentUserId = ref<string | null>(null)
+  const currentUserName = ref<string | null>(null)
+  const needsLogin = computed(() => !currentUserId.value && isMultiUserServer)
+
   async function initialize() {
-    // userConfig.value = await api.getUserConfig()
+    initialized.value = true
     currentUserId.value = localStorage['Comfy.userId']
   }
 
-  /**
-   * Create a new user.
-   *
-   * @param username - The username.
-   * @returns The new user.
-   */
-  async function createUser(user: {
-    username: string
-    password: string
-  }): Promise<User> {
+  async function createUser(user: UserLogin): Promise<User> {
     const resp = await api.createUser(user)
     const data = await resp.json()
 
@@ -66,21 +45,29 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  /**
-   * Login the current user.
-   *
-   * @param user - The user.
-   */
-  async function login({
-    userId,
-    username
-  }: {
-    userId: string
-    username: string
-  }) {
-    currentUserId.value = userId
-    localStorage['Comfy.userId'] = userId
-    localStorage['Comfy.userName'] = username
+  async function login(user: UserLogin): Promise<User> {
+    const resp = await api.userLogin(user)
+    const data = await resp.json()
+
+    if (resp.status >= 300) {
+      throw new Error(data.error)
+    }
+
+    currentUserId.value = data.userId
+    currentUserName.value = user.username
+    localStorage['Comfy.userId'] = data.userId
+    localStorage['Comfy.userName'] = user.username
+    api.user = data.userId
+
+    return {
+      userId: data,
+      username: user.username
+    }
+  }
+
+  async function logout() {
+    delete localStorage['Comfy.userId']
+    delete localStorage['Comfy.userName']
   }
 
   watchEffect(() => {
@@ -89,20 +76,12 @@ export const useUserStore = defineStore('user', () => {
     }
   })
 
-  /**
-   * Logout the current user.
-   */
-  async function logout() {
-    delete localStorage['Comfy.userId']
-    delete localStorage['Comfy.userName']
-  }
-
   return {
-    users,
-    currentUser,
     isMultiUserServer,
     needsLogin,
     initialized,
+    currentUserId,
+    currentUserName,
     initialize,
     createUser,
     login,

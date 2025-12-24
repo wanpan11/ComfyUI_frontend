@@ -1,26 +1,23 @@
 <template>
   <BaseViewTemplate dark>
     <main
-      id="comfy-user-selection"
       class="relative min-w-84 rounded-lg bg-(--comfy-menu-bg) p-5 px-10 shadow-lg"
     >
-      <h1 class="my-2.5 mb-7 font-normal">注册用户</h1>
+      <h1 class="my-2.5 mb-7 font-normal">用户录入</h1>
 
       <div class="flex w-full flex-col items-center">
         <div class="flex w-full flex-col gap-2">
           <label for="username-input">用户名:</label>
-          <InputText v-model="username" />
+          <InputText v-model="username" placeholder="请输入用户名" />
         </div>
 
         <div class="flex w-full flex-col gap-2 mt-3">
-          <label for="password-input"
-            >{{ t('auth.login.passwordLabel') }}:</label
-          >
-          <InputText v-model="password" />
+          <label for="password-input">密码:</label>
+          <InputText v-model="password" placeholder="请输入密码" />
         </div>
 
         <footer class="mt-5">
-          <Button :label="t('auth.login.loginButton')" @click="register" />
+          <Button label="录入" @click="register" />
         </footer>
       </div>
 
@@ -33,14 +30,12 @@
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import { useToast } from 'primevue/usetoast'
-import { onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref } from 'vue'
 
 import GlobalToast from '@/components/toast/GlobalToast.vue'
 import { useUserStore } from '@/stores/userStore'
 import BaseViewTemplate from '@/views/templates/BaseViewTemplate.vue'
 
-const { t } = useI18n()
 const userStore = useUserStore()
 const toast = useToast()
 
@@ -71,10 +66,4 @@ const register = async () => {
     })
   }
 }
-
-onMounted(async () => {
-  if (!userStore.initialized) {
-    await userStore.initialize()
-  }
-})
 </script>
