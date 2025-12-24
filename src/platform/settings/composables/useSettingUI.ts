@@ -2,7 +2,6 @@ import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import type { Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useCurrentUser } from '@/composables/auth/useCurrentUser'
 import { isCloud } from '@/platform/distribution/types'
 import type { SettingTreeNode } from '@/platform/settings/settingStore'
 import { useSettingStore } from '@/platform/settings/settingStore'
@@ -29,7 +28,7 @@ export function useSettingUI(
     | 'subscription'
 ) {
   const { t } = useI18n()
-  const { isLoggedIn } = useCurrentUser()
+  // const { isLoggedIn } = useCurrentUser()
   const settingStore = useSettingStore()
   const activeCategory = ref<SettingTreeNode | null>(null)
 
@@ -188,22 +187,22 @@ export function useSettingUI(
 
   const groupedMenuTreeNodes = computed<SettingTreeNode[]>(() => [
     // Account settings - show different panels based on distribution and auth state
-    {
-      key: 'account',
-      label: 'Account',
-      children: [
-        userPanel.node,
-        ...(isLoggedIn.value &&
-        shouldShowPlanCreditsPanel.value &&
-        subscriptionPanel
-          ? [subscriptionPanel.node]
-          : []),
-        ...(isLoggedIn.value &&
-        !(isCloud && window.__CONFIG__?.subscription_required)
-          ? [creditsPanel.node]
-          : [])
-      ].map(translateCategory)
-    },
+    // {
+    //   key: 'account',
+    //   label: 'Account',
+    //   children: [
+    //     userPanel.node,
+    //     ...(isLoggedIn.value &&
+    //     shouldShowPlanCreditsPanel.value &&
+    //     subscriptionPanel
+    //       ? [subscriptionPanel.node]
+    //       : []),
+    //     ...(isLoggedIn.value &&
+    //     !(isCloud && window.__CONFIG__?.subscription_required)
+    //       ? [creditsPanel.node]
+    //       : [])
+    //   ].map(translateCategory)
+    // },
     // Normal settings stored in the settingStore
     {
       key: 'settings',
