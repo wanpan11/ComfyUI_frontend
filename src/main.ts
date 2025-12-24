@@ -18,7 +18,7 @@ import router from '@/router'
 import App from './App.vue'
 // Intentionally relative import to ensure the CSS is loaded in the right order (after litegraph.css)
 import './assets/css/style.css'
-import { i18n } from './i18n'
+import { i18n, loadLocale } from './i18n'
 
 /**
  * CRITICAL: Load remote config FIRST for cloud builds to ensure
@@ -30,6 +30,15 @@ if (isCloud) {
   const { loadRemoteConfig } =
     await import('@/platform/remoteConfig/remoteConfig')
   await loadRemoteConfig()
+}
+
+// Ensure initial locale messages are loaded before mounting the app
+const initialLocale =
+  (i18n.global.locale as { value?: string }).value ??
+  (i18n.global.locale as unknown as string) ??
+  'en'
+if (initialLocale !== 'en') {
+  await loadLocale(initialLocale)
 }
 
 const ComfyUIPreset = definePreset(Aura, {

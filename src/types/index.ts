@@ -9,7 +9,7 @@ import type {
   Settings,
   SystemStats,
   TerminalSize,
-  User,
+  // User,
   UserData,
   UserDataFullInfo
 } from '@/schemas/apiSchema'
@@ -48,7 +48,7 @@ export type {
   Settings,
   DeviceStats,
   SystemStats,
-  User,
+  // User,
   UserData,
   UserDataFullInfo,
   TerminalSize,

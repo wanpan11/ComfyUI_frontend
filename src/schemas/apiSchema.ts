@@ -345,13 +345,13 @@ const zSystemStats = z.object({
   }),
   devices: z.array(zDeviceStats)
 })
-const zUser = z.object({
-  storage: z.enum(['server']),
-  // `migrated` is only available in single-user mode.
-  migrated: z.boolean().optional(),
-  // `users` is only available in multi-user server mode.
-  users: z.record(z.string(), z.string()).optional()
-})
+// const zUser = z.object({
+//   storage: z.enum(['server']),
+//   // `migrated` is only available in single-user mode.
+//   migrated: z.boolean().optional(),
+//   // `users` is only available in multi-user server mode.
+//   users: z.record(z.string(), z.string()).optional()
+// })
 const zUserData = z.array(z.array(z.string(), z.string()))
 const zUserDataFullInfo = z.object({
   path: z.string(),
@@ -547,7 +547,7 @@ export type NodeError = z.infer<typeof zNodeError>
 export type Settings = z.infer<typeof zSettings>
 export type DeviceStats = z.infer<typeof zDeviceStats>
 export type SystemStats = z.infer<typeof zSystemStats>
-export type User = z.infer<typeof zUser>
+// export type User = z.infer<typeof zUser>
 export type UserData = z.infer<typeof zUserData>
 export type UserDataFullInfo = z.infer<typeof zUserDataFullInfo>
 export type TerminalSize = z.infer<typeof zTerminalSize>
