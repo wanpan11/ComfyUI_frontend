@@ -31,7 +31,7 @@ const isFileProtocol = window.location.protocol === 'file:'
 function getBasePath(): string {
   if (isElectron()) return '/'
   if (isCloud) return import.meta.env?.BASE_URL || '/'
-  return window.location.pathname
+  return '/'
 }
 
 const basePath = getBasePath()
@@ -58,16 +58,21 @@ const router = createRouter({
             const userStore = useUserStore()
             await userStore.initialize()
             if (userStore.needsLogin) {
-              next('/user-select')
+              next('/login')
             } else {
               next()
             }
           }
         },
         {
-          path: 'user-select',
-          name: 'UserSelectView',
-          component: () => import('@/views/UserSelectView.vue')
+          path: 'login',
+          name: 'LoginView',
+          component: () => import('@/views/LoginView.vue')
+        },
+        {
+          path: 'register',
+          name: 'UserRegister',
+          component: () => import('@/views/UserRegister.vue')
         }
       ]
     }
